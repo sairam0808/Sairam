@@ -1,0 +1,95 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v4.json",
+  "width": 5000,
+  "height": 500,
+  "padding": 5,
+
+  "data": [
+    {
+     "name": "Losses",
+     "url": "https://raw.githubusercontent.com/sairam0808/Sairam/master/losses2015_transformed.csv",
+     "format": {"type": "csv", "parse": "auto"},
+     "transform":[
+       {
+         "type":"aggregate",
+         "groupby":["Damage_Descp"],
+         "ops":["sum"],
+         "fields":["Amount"]
+       }
+     ]
+   }
+  ],
+
+  "signals": [
+    {
+      "name": "tooltip",
+      "value": {},
+      "on": [
+        {"events": "rect:mouseover", "update": "datum"},
+        {"events": "rect:mouseout",  "update": "{}"}
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "band",
+      "domain": {"data": "Losses", "field": "Damage_Descp"},
+      "range": "width",
+      "padding": 0.05,
+      "round": true
+    },
+    {
+      "name": "yscale",
+      "domain": {"data": "Losses", "field": "sum_Amount"},
+      "nice": true,
+      "range": "height"
+    }
+  ],
+
+  "axes": [
+    { "orient": "bottom", "scale": "xscale" },
+    { "orient": "left", "scale": "yscale" }
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data":"Losses"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "xscale", "field": "Damage_Descp"},
+          "width": {"scale": "xscale", "band": 1},
+          "y": {"scale": "yscale", "field": "sum_Amount"},
+          "y2": {"scale": "yscale", "value": 0}
+        },
+        "update": {
+          "fill": {"value": "steelblue"}
+        },
+        "hover": {
+          "fill": {"value": "red"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "align": {"value": "center"},
+          "baseline": {"value": "bottom"},
+          "fill": {"value": "#333"}
+        },
+        "update": {
+          "x": {"scale": "xscale", "signal": "tooltip.Damage_Descp", "band": 0.5},
+          "y": {"scale": "yscale", "signal": "tooltip.sum_Amount", "offset": -2},
+          "text": {"signal": "tooltip.sum_Amount"},
+          "fillOpacity": [
+            {"test": "datum === tooltip", "value": 0},
+            {"value": 1}
+          ]
+        }
+      }
+    }
+  ]
+}
