@@ -1,5 +1,6 @@
-{
-  "$schema": "https://vega.github.io/schema/vega/v4.json",
+ 
+ 
+  {"$schema": "https://vega.github.io/schema/vega/v4.json",
   "width": 960,
   "height": 500,
   "autosize": "none",
@@ -9,24 +10,27 @@
       "name": "statescode",
       "url": "https://raw.githubusercontent.com/sairam0808/Sairam/master/losses2015_transformed.csv",
       "format": {"type": "csv", "parse": "auto"},
-            "type" : "aggregate",
-            "transform" : [ {
-                "type" : "aggregate",
-                "groupby" : ["State_Code"],
-                "fields" : ["Amount"],
-                "ops" : ["sum"],
-                "as" : ["Amount"]
-            }]
+            "type": "aggregate",
+      "transform":[ {
+      "type": "aggregate",
+      "groupby": ["State_Code","State_Abv"],
+      "fields": ["Amount"],
+      "ops": ["sum"],
+      "as" : ["Amount"]
 
+      }
+        
+      ]
     },
     {
       "name": "states",
       "url": "https://raw.githubusercontent.com/sairam0808/Sairam/master/us-10m.json",
       "format": {"type": "topojson", "feature": "states"},
       "transform": [
-        {"type" : "geopath", "projection" : "projection"},
-        { "type": "lookup", "from": "statescode", "key": "State_Code", "fields": ["id"], "values": ["Amount"] },
-        { "type": "filter", "expr": "datum.Amount != null" }
+        { "type": "geopath", "projection": "projection" }, 
+        { "type": "lookup", "from": "statescode","key":"State_Code",
+        "fields": ["id"],"values": ["State_Code","State_Abv","Amount"] },
+        {"type":"filter","expr":"datum.Amount != null"}
       ]
     }
   ],
@@ -42,7 +46,7 @@
     {
       "name": "color",
       "type": "sequential",
-      "domain": {"data" : "statescode","field": "Amount"},
+      "domain": {"data":"statescode","field":"Amount"},
       "range": {"scheme": "blues", "count": 7}
     }
   ],
@@ -61,7 +65,7 @@
       "type": "shape",
       "from": {"data": "states"},
       "encode": {
-        "enter": { "tooltip": {"signal": "format(datum.Amount, '2s')"}, "stroke": {"value": "black"},"fill": {"value": "#000FF"}},
+        "enter": { "tooltip": {"signal": " 'States :'+datum.State_Abv+'Amount:'+format(datum.Amount, '2s')"},"stroke":{"value":"black"},"fill":{"value":"#0000FF"}},
         "update": { "fill": {"scale": "color", "field": "Amount"} },
         "hover": { "fill": {"value": "red"} }
       },
